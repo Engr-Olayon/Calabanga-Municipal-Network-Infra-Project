@@ -1,7 +1,9 @@
 # Departments, VLAN Design & IP Addressing Scheme
 
 Design Approach
-Rather than using VLSM to save every possible IP address, this design gives each VLAN a /24 subnet within the private 10.10.0.0/16 range. This makes the network easier for a small MIS team to manage and troubleshoot. Using a simple VLAN ID → third-octet numbering scheme also makes ACLs and IP addresses easier to understand. In this case, easy management and maintenance are more important than saving a small number of IP addresses.
+Rather than using VLSM to save every possible IP address, this design gives each VLAN a /24 subnet within the private 10.10.0.0/16 range. 
+This makes the network easier for a small MIS team to manage and troubleshoot. Using a simple VLAN ID → third-octet numbering scheme also 
+makes ACLs and IP addresses easier to understand. In this case, easy management and maintenance are more important than saving a small number of IP addresses.
 Numbering convention: VLAN 10 → 10.10.10.0/24, VLAN 20 → 10.10.20.0/24, etc. Gateway is always .1 (an SVI on the core Layer 3 switch).
 
 VLAN & Department Table
@@ -32,7 +34,9 @@ VLAN        Department(s)                                    Subnet             
 240	        CCTV / Security Cameras                          10.10.240.0/24	      10.10.240.1
 
 VLAN Grouping Rationale
-Smaller offices like Public Info, Tourism, and Cooperative Development are grouped into one VLAN (190) instead of having separate VLANs. Since these offices have only a few users, separate VLANs would add extra management work without much security benefit. Grouping offices with similar functions and security needs makes the network simpler and easier to manage.
+Smaller offices like Public Info, Tourism, and Cooperative Development are grouped into one VLAN (190) instead of having separate VLANs. 
+Since these offices have only a few users, separate VLANs would add extra management work without much security benefit. Grouping offices 
+with similar functions and security needs makes the network simpler and easier to manage.
 
 Security-Sensitive VLANs (flagged for the ACL design)
 These VLANs handle resident data or financial records and must be explicitly walled off from public-facing VLANs (220 Guest WiFi, 230 Kiosks):
