@@ -1,0 +1,24 @@
+# Security Design - Zones, ACLs & Layer 2 Hardening
+
+Design Philosophy
+Instead of creating an ACL for every VLAN pair, this design groups VLANs into trust zones and applies ACLs between those zones. Access is denied by default unless there is a specific business need. This keeps the ACLs manageable while allowing necessary communication between departments.
+
+Trust Zones
+Zone	        VLANs	                                                                                                            Trust Level
+Zone A        Public/Untrusted	220 (Guest WiFi), 230 (Public Kiosks)	                                                          No access to any internal VLAN. Internet/public-service access only.
+Zone B        Operational/Semi-trusted	210 (Staff WiFi), 240 (CCTV)	                                                          Limited, specific access — not full internal reach.
+Zone C        General Departments	(10, 20, 60, 80, 90, 110, 120, 140, 150, 160, 170, 190, 200)	                                Can reach shared internal resources (file/print/intranet) and the internet. Default-deny to Zone D.
+Zone D        Restricted/Sensitive	30 (Treasurer), 40 (Assessor), 70 (Civil Registrar), 100 (MSWD), 180 (IT/MIS + Servers)	    Locked down. Only specific, named cross-VLAN flows permitted. Management access restricted to IT/MIS.
+
+Real Government Workflow Exception Real-world Example: Business Permit Processing
+Business permit renewal at the BPLO (VLAN 130) needs access to property assessment from the Assessor (VLAN 40) and tax clearance from the Treasurer (VLAN 30). Since this is a real LGU process, these connections are allowed as specific, limited exceptions to the default-deny rule.
+* Permit: VLAN 130 (BPLO) → VLAN 40 (Assessor) — TCP, application port only
+* Permit: VLAN 130 (BPLO) → VLAN 30 (Treasurer) — TCP, application port only
+* Deny: everything else between Zone D and Zone C, implicit
+
+Layer 2 Hardening
+* Port security on all access ports (max 1 MAC addresses per port, violation = shutdown) prevents unauthorized device plug-ins, common in a public-facing government building.
+* DHCP snooping on all user VLANs — blocks rogue DHCP servers, trusts only the uplink to the real DHCP server.
+* Dynamic ARP Inspection (DAI) — prevents ARP spoofing/man-in-the-middle within a VLAN, paired with DHCP snooping.
+* BPDU Guard on access ports — protects against accidental or malicious switch loops from someone plugging in an unmanaged switch.
+
