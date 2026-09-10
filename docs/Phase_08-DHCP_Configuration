@@ -1,0 +1,19 @@
+# Centralized DHCP Configuration
+
+Architecture
+One DHCP server (Server1-DHCPDNS, 10.10.180.10) in VLAN 180 serves all VLANs. Each VLAN uses DHCP relay (ip helper-address) on its SVI on both core switches to forward requests to the server. This keeps the network simple and centralized, instead of needing a separate DHCP server for each VLAN.
+
+Configure DHCP Relay on Both Core Switches
+Adds ip helper-address 10.10.180.10 to every VLAN's SVI, so DHCP broadcasts from any department get forwarded to the real server regardless of which core switch is currently active for that VLAN.
+
+Configure DHCP Pools on the Server
+Pool Name	           Network	      Default Gateway	  DNS Server	     Start IP	    Subnet Mask	    Max Users
+POOL-Mayor	         10.10.10.0	    10.10.10.1	      10.10.180.10	   10.10.10.11	255.255.255.0	  200
+POOL-SessionHall	   10.10.20.0	    10.10.20.1	      10.10.180.10	   10.10.20.11	255.255.255.0	  200
+POOL-Treasurer	     10.10.30.0	    10.10.30.1	      10.10.180.10	   10.10.30.11	255.255.255.0	  200
+------------------------------------- And the rest of the VLAN ------------------------------------------------
+
+Set PCs to DHCP
+Start doing DHCP Request for every End-Devices (PCs, Printers, and CCTV)
+[ipconfig /renew]
+[ipconfig] to verify
