@@ -12,6 +12,8 @@ Hostnames of Switches
 * SW-2F-B3 = Switch 2nd Floor wing B3 (MIS/IT Room)
 * CORE-SW-A = Core Switch A
 * CORE-SW-B = Core Switch B
+* EDGE-RTR-A = Edge Router A
+* EDGE-RTR-B = Edge Router B
 
 Manual Configuration (no VTP)
 * vlan 10
