@@ -1,0 +1,56 @@
+# Full Connectivity Test Plan
+Run this before applying the ACLs to record the current network baseline. At this stage, all VLANs can reach each other because no ACLs are active. After applying the ACLs, run the same tests again to confirm that the rules are working. This before-and-after comparison provides clear evidence that the security design is actually enforcing the intended access rules.
+
+Test 1: Local Gateway Reachability
+Confirms each VLAN's HSRP gateway is reachable from a real device in that VLAN.
+#	      Source	                         Command	            Expected
+1.1	    Treasurer PC (VLAN 30)	         ping 10.10.30.1	    Success
+1.2	    Agriculture PC (VLAN 110)	       ping 10.10.110.1	    Success
+1.3	    HRMO PC (VLAN 140)	             ping 10.10.140.1	    Success
+1.4	    Records/Library PC (VLAN 200)	   ping 10.10.200.1	    Success
+1.5	    Staff WiFi laptop (VLAN 210)	   ping 10.10.210.1	    Success
+
+
+Test 2: Server Reachability From Every Zone
+Every department should be able to reach the centralized DHCP/DNS server (10.10.180.10) and the App/DB server (10.10.180.20)
+#	    Source        (Zone)	  Command	            Expected NOW (no ACL)	Expected AFTER ACL
+2.1	  Treasurer     (Zone D)	ping 10.10.180.10	  Success	              Success
+2.2	  Agriculture   (Zone C)	ping 10.10.180.10	  Success	              Success
+2.3	  Guest WiFi    (Zone A)	ping 10.10.180.10	  Success               Should still succeed
+
+
+Test 3: The Real Security Gap — Zone A/B Reaching Zone D
+#	    Source	              Destination	                  	Expected NOW (no ACL)	  Expected AFTER ACL
+3.1	  Guest WiFi (220)	    Treasurer PC (VLAN 30)	      	Success	                Should fail (Destination unreachable)
+3.2	  Public Kiosk (230)	  Civil Registrar PC (VLAN 70)	  Success                	Should fail
+3.3	  Staff WiFi (210)	    Assessor PC (VLAN 40)	       	  Success	                Should fail
+3.4	  Agriculture (Zone C)	Treasurer PC (VLAN 30)	        Success	                Should fail
+
+Test 4: The One Exception That Should ALWAYS Succeed
+The documented BPLO↔Assessor↔Treasurer workflow exception from doc 03 — confirm this works both before and after ACLs (it's supposed to be permitted, not blocked):
+#	    Source	        Destination	        Expected NOW	   Expected AFTER ACL
+4.1	  BPLO PC (130)	  Assessor PC (40)		Success	         Success (documented exception)
+4.2	  BPLO PC (130)	  Treasurer PC (30)	  Success	         Success (documented exception)
+
+
+Test 5: CCTV Isolation
+Cameras should only ever reach the NVR server, never be reachable from user devices:
+#	    Source	                Destination	                          Expected NOW	  Expected AFTER ACL
+5.1	  Treasurer PC	          A local CCTV camera's IP (VLAN 240)	  Success	        Should fail (no user VLAN should reach cameras directly)
+5.2	  Server room (VLAN 180)	Any CCTV camera	ping [camera IP]	    Success	        Success (NVR needs to reach cameras)
+
+Test 6: HSRP Failover (redundancy proof)
+Already partially tested during doc 07, but worth re-confirming as part of a full pass:
+1. From a Treasurer PC, ping 10.10.30.1 -t (continuous ping, if supported) or repeated single pings
+2. On CORE-SW-A: interface vlan 30 → shutdown
+3. Watch the ping — should have zero or minimal loss, since CORE-SW-B takes over
+4. no shutdown on CORE-SW-A afterward — confirm preempt reclaims Active status via show standby brief
+
+Test 7: Wireless End-to-End
+#	    Test	                                       Expected
+7.1	  Laptop associates to CalabangaGov-Staff	     Success, correct PSK required
+7.2	  Laptop gets DHCP lease in VLAN 210 range	   Success
+7.3	  Laptop pings its own gateway 10.10.210.1	   Success
+7.4	  Laptop pings DHCP/DNS server 10.10.180.10	   Success
+
+
