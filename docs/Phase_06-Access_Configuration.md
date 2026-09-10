@@ -75,15 +75,15 @@ The core switches already perform all inter-VLAN routing (via SVIs + HSRP) for e
 Access Switch Trunk Uplinks (per-switch allowed VLAN lists)
 Each access switch has two uplink ports (to CORE-SW-A and CORE-SW-B). Restrict allowed vlan to only what that switch actually carries — Staff WiFi (210) and CCTV (240) are included wherever that switch has an AP or camera:
 
-SW-GF-A1	= 30,40,210,220,240,999
-SW-GF-A2	= 70,130,210,220,230,240,999
-SW-GF-B1	= 20,100,210,220,240,999
-SW-GF-B2	= 190,200,210,220,240,999
-SW-2F-A1	= 10,140,170,210,220,240,999
-SW-2F-A2	= 50,60,150,210,220,240,999
-SW-2F-B1	= 80,90,210,240,220,999
-SW-2F-B2	= 110,120,160,210,220,240,999
-SW-2F-B3	= 180,210,240,220,999
+* SW-GF-A1	= 30,40,210,220,240,999
+* SW-GF-A2	= 70,130,210,220,230,240,999
+* SW-GF-B1	= 20,100,210,220,240,999
+* SW-GF-B2	= 190,200,210,220,240,999
+* SW-2F-A1	= 10,140,170,210,220,240,999
+* SW-2F-A2	= 50,60,150,210,220,240,999
+* SW-2F-B1	= 80,90,210,240,220,999
+* SW-2F-B2	= 110,120,160,210,220,240,999
+* SW-2F-B3	= 180,210,240,220,999
 
 Access Ports — Assigning End Devices
 Every PC/printer/camera port is access mode, assigned to its one VLAN, with port security and BPDU Guard:
